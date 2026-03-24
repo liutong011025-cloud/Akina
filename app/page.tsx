@@ -449,6 +449,46 @@ export default function AkinaApp() {
     }
   }
 
+  const handleShareActivity = async (activity: {
+    id: string
+    title: string
+    sportType: string
+    meetingTime: string
+    meetingLocation: string
+  }) => {
+    const sportLabel = activity.sportType === 'cycling'
+      ? (lang === 'en' ? 'Cycling' : '骑行')
+      : (lang === 'en' ? 'Hiking' : '徒步')
+
+    const shareText = lang === 'en'
+      ? `Join my activity!\n${activity.title}\nType: ${sportLabel}\nTime: ${new Date(activity.meetingTime).toLocaleString()}\nLocation: ${activity.meetingLocation}`
+      : `来参加我的活动！\n${activity.title}\n类型：${sportLabel}\n时间：${new Date(activity.meetingTime).toLocaleString('zh-CN')}\n地点：${activity.meetingLocation}`
+
+    const shareUrl = typeof window !== 'undefined'
+      ? `${window.location.origin}/?activity=${activity.id}`
+      : ''
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: activity.title,
+          text: shareText,
+          url: shareUrl,
+        })
+        return
+      }
+    } catch {
+      // User cancelled native share or sharing failed; fallback below.
+    }
+
+    try {
+      await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`)
+      alert(lang === 'en' ? 'Activity info copied. Paste it in WeChat.' : '活动信息已复制，可直接粘贴到微信。')
+    } catch {
+      alert(lang === 'en' ? 'Share is not supported in this browser.' : '当前浏览器不支持分享，请手动复制链接。')
+    }
+  }
+
   const handleViewChange = (view: string) => {
     if (view === 'profile' && !user) {
       setActiveView('login')
@@ -518,6 +558,7 @@ export default function AkinaApp() {
             }))}
             joinedActivities={joinedActivityIds}
             onJoinActivity={handleJoinActivity}
+            onShareActivity={handleShareActivity}
             isLoggedIn={!!user}
             onLoginRequired={() => setActiveView('login')}
           />
@@ -574,6 +615,7 @@ export default function AkinaApp() {
             }))}
             joinedActivityIds={joinedActivityIds}
             onUploadPhoto={handleUploadPhoto}
+            onShareActivity={handleShareActivity}
           />
         )
       case 'profile':
