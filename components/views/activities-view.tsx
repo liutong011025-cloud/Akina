@@ -11,6 +11,7 @@ interface ActivitiesViewProps {
   joinedActivities: string[]
   onJoinActivity: (activityId: string) => void
   onShareActivity: (activity: Activity) => Promise<void>
+  currentUserId?: string
   isLoggedIn?: boolean
   onLoginRequired?: () => void
 }
@@ -21,6 +22,7 @@ export default function ActivitiesView({
   joinedActivities,
   onJoinActivity,
   onShareActivity,
+  currentUserId,
   isLoggedIn = false,
   onLoginRequired
 }: ActivitiesViewProps) {
@@ -83,7 +85,7 @@ export default function ActivitiesView({
         {/* Activity List */}
         <div className="px-5 flex flex-col gap-4">
           {filteredActivities.map((activity) => {
-            const isJoined = joinedActivities.includes(activity.id)
+            const isJoined = joinedActivities.includes(activity.id) || activity.organizerId === currentUserId
             const isFull = activity.currentParticipants >= activity.maxParticipants
             const isPast = activity.isCompleted || new Date(activity.meetingTime) <= new Date()
             const spotsLeft = activity.maxParticipants - activity.currentParticipants
