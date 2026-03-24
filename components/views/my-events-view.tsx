@@ -2,7 +2,7 @@
 
 // Force rebuild - v3 - fixed duplicate state
 import { useState, useRef } from 'react'
-import { Bike, Footprints, Star, Clock, MapPin, Camera, X, Image as ImageIcon } from 'lucide-react'
+import { Bike, Footprints, Star, Clock, MapPin, Camera, X, Share2, Image as ImageIcon } from 'lucide-react'
 import { translations, Activity } from '@/lib/types'
 import GlassSurface from '@/components/glass-surface'
 
@@ -11,13 +11,15 @@ interface MyEventsViewProps {
   activities: Activity[]
   joinedActivityIds: string[]
   onUploadPhoto: (activityId: string, photoFile: File) => Promise<void>
+  onShareActivity: (activity: Activity) => Promise<void>
 }
 
 export default function MyEventsView({ 
   lang, 
   activities, 
   joinedActivityIds,
-  onUploadPhoto 
+  onUploadPhoto,
+  onShareActivity
 }: MyEventsViewProps) {
   const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming')
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
@@ -161,11 +163,20 @@ export default function MyEventsView({
                         ))}
                       </div>
                     </div>
-                    {tab === 'past' && (
-                      <span className="text-xs font-bold px-2 py-1 rounded-full bg-muted text-muted-foreground">
-                        {lang === 'en' ? 'Completed' : '已完成'}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {tab === 'past' && (
+                        <span className="text-xs font-bold px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                          {lang === 'en' ? 'Completed' : '已完成'}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => void onShareActivity(activity)}
+                        className="p-2 rounded-full bg-muted text-muted-foreground"
+                        aria-label={lang === 'en' ? 'Share activity' : '分享活动'}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   <h4 className="text-base font-black text-foreground mb-3">{activity.title}</h4>
