@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
-import { Bike, Footprints, Star, Clock, MapPin, Users, Phone, Package, FileText } from 'lucide-react'
+import { Bike, Footprints, Star, Clock, MapPin, Users, Phone, Package, FileText, Share2 } from 'lucide-react'
 import { translations, Activity, SportType } from '@/lib/types'
 import GlassSurface from '@/components/glass-surface'
 
@@ -10,6 +10,7 @@ interface ActivitiesViewProps {
   activities: Activity[]
   joinedActivities: string[]
   onJoinActivity: (activityId: string) => void
+  onShareActivity: (activity: Activity) => Promise<void>
   isLoggedIn?: boolean
   onLoginRequired?: () => void
 }
@@ -19,6 +20,7 @@ export default function ActivitiesView({
   activities, 
   joinedActivities,
   onJoinActivity,
+  onShareActivity,
   isLoggedIn = false,
   onLoginRequired
 }: ActivitiesViewProps) {
@@ -152,28 +154,40 @@ export default function ActivitiesView({
                         {activity.organizerName || 'Unknown'}
                       </span>
                     </div>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        if (!isLoggedIn && onLoginRequired) {
-                          onLoginRequired()
-                          return
-                        }
-                        if (!isJoined && !isFull) {
-                          onJoinActivity(activity.id)
-                        }
-                      }}
-                      disabled={isFull && !isJoined}
-                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all active:scale-95 ${
-                        isJoined 
-                          ? 'bg-highlight-green text-white' 
-                          : isFull 
-                            ? 'bg-muted text-muted-foreground cursor-not-allowed' 
-                            : 'bg-foreground text-background'
-                      }`}
-                    >
-                      {isJoined ? t.joined : isFull ? t.full : t.join}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          void onShareActivity(activity)
+                        }}
+                        className="p-2 rounded-full bg-muted text-muted-foreground"
+                        aria-label={lang === 'en' ? 'Share activity' : '分享活动'}
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (!isLoggedIn && onLoginRequired) {
+                            onLoginRequired()
+                            return
+                          }
+                          if (!isJoined && !isFull) {
+                            onJoinActivity(activity.id)
+                          }
+                        }}
+                        disabled={isFull && !isJoined}
+                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all active:scale-95 ${
+                          isJoined 
+                            ? 'bg-highlight-green text-white' 
+                            : isFull 
+                              ? 'bg-muted text-muted-foreground cursor-not-allowed' 
+                              : 'bg-foreground text-background'
+                        }`}
+                      >
+                        {isJoined ? t.joined : isFull ? t.full : t.join}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </GlassSurface>
@@ -193,6 +207,9 @@ export default function ActivitiesView({
             onJoinActivity(selectedActivity.id)
             setSelectedActivity(null)
           }}
+          onShare={() => {
+            void onShareActivity(selectedActivity)
+          }}
         />
       )}
     </div>
@@ -205,12 +222,14 @@ function ActivityDetailModal({
   isJoined,
   onClose,
   onJoin,
+  onShare,
 }: {
   activity: Activity
   lang: 'en' | 'zh'
   isJoined: boolean
   onClose: () => void
   onJoin: () => void
+  onShare: () => void
 }) {
   const t = translations[lang].activities
   const isFull = activity.currentParticipants >= activity.maxParticipants
@@ -346,19 +365,28 @@ function ActivityDetailModal({
           )}
         </div>
 
-        <button 
-          onClick={onJoin}
-          disabled={isFull && !isJoined}
-          className={`w-full py-4 rounded-2xl text-base font-bold transition-all active:scale-98 ${
-            isJoined 
-              ? 'bg-highlight-green text-white' 
-              : isFull 
-                ? 'bg-muted text-muted-foreground cursor-not-allowed' 
-                : 'bg-foreground text-background'
-          }`}
-        >
-          {isJoined ? t.joined : isFull ? t.full : t.join}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onShare}
+            className="px-4 rounded-2xl bg-muted text-muted-foreground font-bold flex items-center justify-center"
+            aria-label={lang === 'en' ? 'Share activity' : '分享活动'}
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+          <button 
+            onClick={onJoin}
+            disabled={isFull && !isJoined}
+            className={`flex-1 py-4 rounded-2xl text-base font-bold transition-all active:scale-98 ${
+              isJoined 
+                ? 'bg-highlight-green text-white' 
+                : isFull 
+                  ? 'bg-muted text-muted-foreground cursor-not-allowed' 
+                  : 'bg-foreground text-background'
+            }`}
+          >
+            {isJoined ? t.joined : isFull ? t.full : t.join}
+          </button>
+        </div>
       </div>
     </div>
   )
