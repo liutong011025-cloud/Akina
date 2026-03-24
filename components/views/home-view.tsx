@@ -2,18 +2,43 @@
 
 import { Bike, Footprints, ChevronRight, Star, Clock, MapPin, Users } from 'lucide-react'
 import { translations, Activity } from '@/lib/types'
-import { mockActivities } from '@/lib/mock-data'
 import GlassSurface from '@/components/glass-surface'
 
 interface HomeViewProps {
   lang: 'en' | 'zh'
   onViewChange: (view: string) => void
+  activities: Activity[]
+  currentUserId?: string
+  joinedActivityIds?: string[]
 }
 
-export default function HomeView({ lang, onViewChange }: HomeViewProps) {
+export default function HomeView({
+  lang,
+  onViewChange,
+  activities,
+  currentUserId,
+  joinedActivityIds = [],
+}: HomeViewProps) {
   const t = translations[lang].home
 
-  const featuredActivities = mockActivities.filter(a => !a.isCompleted).slice(0, 3)
+  const upcomingActivities = activities
+    .filter((a) => !a.isCompleted)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+  const myActivityIds = new Set(
+    upcomingActivities
+      .filter(
+        (a) =>
+          (currentUserId ? a.organizerId === currentUserId : false) ||
+          joinedActivityIds.includes(a.id),
+      )
+      .map((a) => a.id),
+  )
+
+  const featuredActivities = [
+    ...upcomingActivities.filter((a) => myActivityIds.has(a.id)),
+    ...upcomingActivities.filter((a) => !myActivityIds.has(a.id)),
+  ].slice(0, 3)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
