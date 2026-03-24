@@ -29,7 +29,6 @@ export default function ActivitiesView({
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
 
   const filteredActivities = activities
-    .filter(a => !a.isCompleted)
     .filter(a => filter === 'all' || a.sportType === filter)
 
   const formatDate = (dateString: string) => {
@@ -85,6 +84,7 @@ export default function ActivitiesView({
           {filteredActivities.map((activity) => {
             const isJoined = joinedActivities.includes(activity.id)
             const isFull = activity.currentParticipants >= activity.maxParticipants
+            const isPast = activity.isCompleted || new Date(activity.meetingTime) <= new Date()
             const spotsLeft = activity.maxParticipants - activity.currentParticipants
 
             return (
@@ -122,6 +122,11 @@ export default function ActivitiesView({
                         />
                       ))}
                     </div>
+                    {isPast && (
+                      <span className="text-xs font-bold px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                        {lang === 'en' ? 'Ended' : '已结束'}
+                      </span>
+                    )}
                   </div>
 
                   <h4 className="text-base font-black text-foreground mb-3">{activity.title}</h4>
@@ -172,20 +177,20 @@ export default function ActivitiesView({
                             onLoginRequired()
                             return
                           }
-                          if (!isJoined && !isFull) {
+                          if (!isJoined && !isFull && !isPast) {
                             onJoinActivity(activity.id)
                           }
                         }}
-                        disabled={isFull && !isJoined}
+                        disabled={(isFull && !isJoined) || isPast}
                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all active:scale-95 ${
                           isJoined 
                             ? 'bg-highlight-green text-white' 
-                            : isFull 
+                            : (isFull || isPast)
                               ? 'bg-muted text-muted-foreground cursor-not-allowed' 
                               : 'bg-foreground text-background'
                         }`}
                       >
-                        {isJoined ? t.joined : isFull ? t.full : t.join}
+                        {isJoined ? t.joined : isPast ? (lang === 'en' ? 'Ended' : '已结束') : isFull ? t.full : t.join}
                       </button>
                     </div>
                   </div>
@@ -233,6 +238,7 @@ function ActivityDetailModal({
 }) {
   const t = translations[lang].activities
   const isFull = activity.currentParticipants >= activity.maxParticipants
+  const isPast = activity.isCompleted || new Date(activity.meetingTime) <= new Date()
 
   // Prevent body scroll when modal is open
   React.useEffect(() => {
@@ -365,6 +371,30 @@ function ActivityDetailModal({
           )}
         </div>
 
+        {isPast && (
+          <div className="mb-4">
+            <p className="text-xs font-bold text-muted-foreground mb-2">
+              {lang === 'en' ? 'Event Photos' : '活动照片'}
+            </p>
+            {activity.photos && activity.photos.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2">
+                {activity.photos.slice(0, 6).map((photo, idx) => (
+                  <div
+                    key={photo.id || idx}
+                    className="aspect-square rounded-xl overflow-hidden bg-muted"
+                  >
+                    <img src={photo.url} alt="" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {lang === 'en' ? 'No photos yet.' : '暂时还没有照片。'}
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-2">
           <button
             onClick={onShare}
@@ -375,16 +405,16 @@ function ActivityDetailModal({
           </button>
           <button 
             onClick={onJoin}
-            disabled={isFull && !isJoined}
+            disabled={(isFull && !isJoined) || isPast}
             className={`flex-1 py-4 rounded-2xl text-base font-bold transition-all active:scale-98 ${
               isJoined 
                 ? 'bg-highlight-green text-white' 
-                : isFull 
+                : (isFull || isPast)
                   ? 'bg-muted text-muted-foreground cursor-not-allowed' 
                   : 'bg-foreground text-background'
             }`}
           >
-            {isJoined ? t.joined : isFull ? t.full : t.join}
+            {isJoined ? t.joined : isPast ? (lang === 'en' ? 'Ended' : '已结束') : isFull ? t.full : t.join}
           </button>
         </div>
       </div>
