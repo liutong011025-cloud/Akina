@@ -23,8 +23,8 @@ interface ProfileViewProps {
   onLogout: () => void
 }
 
-export default function ProfileView({ 
-  lang, 
+export default function ProfileView({
+  lang,
   user,
   onUpdateUser,
   onLanguageChange,
@@ -114,7 +114,7 @@ export default function ProfileView({
                 </span>
               </div>
             )}
-            <button 
+            <button
               onClick={() => avatarInputRef.current?.click()}
               className="absolute bottom-0 right-0 w-8 h-8 bg-foreground rounded-full flex items-center justify-center active:scale-95 transition-transform"
             >
@@ -163,11 +163,10 @@ export default function ProfileView({
                 key={gender}
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, gender }))}
-                className={`flex-1 py-3 rounded-2xl font-bold transition-all ${
-                  formData.gender === gender
+                className={`flex-1 py-3 rounded-2xl font-bold transition-all ${formData.gender === gender
                     ? 'bg-foreground text-background'
                     : 'bg-muted text-muted-foreground'
-                }`}
+                  }`}
               >
                 {t[gender]}
               </button>
@@ -184,11 +183,10 @@ export default function ProfileView({
             <button
               type="button"
               onClick={() => toggleSport('cycling')}
-              className={`flex-1 py-4 rounded-2xl flex flex-col items-center gap-2 font-bold transition-all ${
-                formData.preferredSports.includes('cycling')
+              className={`flex-1 py-4 rounded-2xl flex flex-col items-center gap-2 font-bold transition-all ${formData.preferredSports.includes('cycling')
                   ? 'bg-highlight-yellow text-foreground'
                   : 'bg-muted text-muted-foreground'
-              }`}
+                }`}
             >
               <Bike className="w-6 h-6" />
               {translations[lang].home.cycling}
@@ -199,11 +197,10 @@ export default function ProfileView({
             <button
               type="button"
               onClick={() => toggleSport('hiking')}
-              className={`flex-1 py-4 rounded-2xl flex flex-col items-center gap-2 font-bold transition-all ${
-                formData.preferredSports.includes('hiking')
+              className={`flex-1 py-4 rounded-2xl flex flex-col items-center gap-2 font-bold transition-all ${formData.preferredSports.includes('hiking')
                   ? 'bg-highlight-green text-white'
                   : 'bg-muted text-muted-foreground'
-              }`}
+                }`}
             >
               <Footprints className="w-6 h-6" />
               {translations[lang].home.hiking}
@@ -220,11 +217,10 @@ export default function ProfileView({
             <button
               type="button"
               onClick={() => onLanguageChange('en')}
-              className={`flex-1 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${
-                lang === 'en'
+              className={`flex-1 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${lang === 'en'
                   ? 'bg-accent text-accent-foreground'
                   : 'bg-muted text-muted-foreground'
-              }`}
+                }`}
             >
               <Globe className="w-4 h-4" />
               English
@@ -232,11 +228,10 @@ export default function ProfileView({
             <button
               type="button"
               onClick={() => onLanguageChange('zh')}
-              className={`flex-1 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${
-                lang === 'zh'
+              className={`flex-1 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${lang === 'zh'
                   ? 'bg-accent text-accent-foreground'
                   : 'bg-muted text-muted-foreground'
-              }`}
+                }`}
             >
               <Globe className="w-4 h-4" />
               中文
@@ -247,11 +242,10 @@ export default function ProfileView({
         {/* Save Button */}
         <button
           onClick={handleSave}
-          className={`w-full py-4 rounded-2xl text-base font-bold transition-all active:scale-98 flex items-center justify-center gap-2 ${
-            isSaved 
-              ? 'bg-highlight-green text-white' 
+          className={`w-full py-4 rounded-2xl text-base font-bold transition-all active:scale-98 flex items-center justify-center gap-2 ${isSaved
+              ? 'bg-highlight-green text-white'
               : 'bg-foreground text-background'
-          }`}
+            }`}
         >
           {isSaved && <Check className="w-5 h-5" />}
           {isSaved ? (lang === 'en' ? 'Saved!' : '已保存！') : t.save}

@@ -97,7 +97,7 @@ export default function AkinaApp() {
     const getSession = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
-      
+
       if (user) {
         // Fetch profile
         const { data: profileData } = await supabase
@@ -105,7 +105,7 @@ export default function AkinaApp() {
           .select('*')
           .eq('id', user.id)
           .single()
-        
+
         if (profileData) {
           setProfile(profileData)
         }
@@ -115,12 +115,12 @@ export default function AkinaApp() {
           .from('activity_participants')
           .select('activity_id')
           .eq('user_id', user.id)
-        
+
         if (participations) {
           setJoinedActivityIds(participations.map(p => p.activity_id))
         }
       }
-      
+
       setIsLoading(false)
     }
 
@@ -129,14 +129,14 @@ export default function AkinaApp() {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null)
-      
+
       if (session?.user) {
         const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single()
-        
+
         if (profileData) {
           setProfile(profileData)
         }
@@ -232,7 +232,7 @@ export default function AkinaApp() {
       .from('activity_participants')
       .select('activity_id')
       .eq('user_id', existingUser.id)
-    
+
     if (participations) {
       setJoinedActivityIds(participations.map(p => p.activity_id))
     }

@@ -13,11 +13,11 @@ interface MyEventsViewProps {
   onUploadPhoto: (activityId: string, photoFile: File) => Promise<void>
 }
 
-export default function MyEventsView({ 
-  lang, 
-  activities, 
+export default function MyEventsView({
+  lang,
+  activities,
   joinedActivityIds,
-  onUploadPhoto 
+  onUploadPhoto
 }: MyEventsViewProps) {
   const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming')
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
@@ -25,17 +25,17 @@ export default function MyEventsView({
   const [isUploading, setIsUploading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  
+
   const t = translations[lang].myevents
 
   const myActivities = activities.filter(a => joinedActivityIds.includes(a.id))
   const now = new Date()
-  
+
   const upcomingActivities = myActivities.filter(a => {
     const meetingTime = new Date(a.meetingTime)
     return meetingTime > now && !a.isCompleted
   })
-  
+
   const pastActivities = myActivities.filter(a => {
     const meetingTime = new Date(a.meetingTime)
     return meetingTime <= now || a.isCompleted
@@ -102,21 +102,19 @@ export default function MyEventsView({
           <div className="flex gap-2">
             <button
               onClick={() => setTab('upcoming')}
-              className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all ${
-                tab === 'upcoming' 
-                  ? 'bg-foreground text-background' 
+              className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all ${tab === 'upcoming'
+                  ? 'bg-foreground text-background'
                   : 'bg-muted text-muted-foreground'
-              }`}
+                }`}
             >
               {t.upcoming} ({upcomingActivities.length})
             </button>
             <button
               onClick={() => setTab('past')}
-              className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all ${
-                tab === 'past' 
-                  ? 'bg-foreground text-background' 
+              className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-all ${tab === 'past'
+                  ? 'bg-foreground text-background'
                   : 'bg-muted text-muted-foreground'
-              }`}
+                }`}
             >
               {t.past} ({pastActivities.length})
             </button>
@@ -143,9 +141,8 @@ export default function MyEventsView({
                 <div className="w-full p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                        activity.sportType === 'cycling' ? 'bg-highlight-yellow' : 'bg-highlight-green'
-                      }`}>
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${activity.sportType === 'cycling' ? 'bg-highlight-yellow' : 'bg-highlight-green'
+                        }`}>
                         {activity.sportType === 'cycling' ? (
                           <Bike className="w-4 h-4 text-foreground" />
                         ) : (
@@ -154,7 +151,7 @@ export default function MyEventsView({
                       </div>
                       <div className="flex items-center gap-0.5">
                         {[1, 2, 3, 4, 5].map((star) => (
-                          <Star 
+                          <Star
                             key={star}
                             className={`w-3 h-3 ${star <= activity.difficulty ? 'fill-primary text-primary' : 'text-muted'}`}
                           />
@@ -187,7 +184,7 @@ export default function MyEventsView({
                         <div>
                           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                             {activity.photos.slice(0, 3).map((photo, idx) => (
-                              <div 
+                              <div
                                 key={photo.id || idx}
                                 className="w-20 h-20 rounded-xl bg-muted flex-shrink-0 overflow-hidden"
                               >
@@ -195,7 +192,7 @@ export default function MyEventsView({
                               </div>
                             ))}
                             {activity.photos.length > 3 && (
-                              <button 
+                              <button
                                 onClick={() => {
                                   setSelectedActivity(activity)
                                   setIsModalOpen(true)
@@ -255,17 +252,17 @@ export default function MyEventsView({
           <div className="bg-background w-full max-w-md rounded-3xl p-6 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-black text-foreground">{selectedActivity.title}</h3>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-3">
               {selectedActivity.photos && selectedActivity.photos.map((photo, idx) => (
-                <div 
+                <div
                   key={photo.id || idx}
                   className="aspect-square rounded-2xl overflow-hidden"
                 >
