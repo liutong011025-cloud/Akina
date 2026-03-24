@@ -529,6 +529,29 @@ export default function AkinaApp() {
           <HomeView
             lang={lang}
             onViewChange={handleViewChange}
+            activities={activities.map(a => ({
+              id: a.id,
+              title: a.title,
+              sportType: a.sportType as 'cycling' | 'hiking',
+              meetingTime: a.meetingTime,
+              meetingLocation: a.meetingLocation,
+              estimatedDuration: String(a.estimatedDuration),
+              maxParticipants: a.maxParticipants,
+              currentParticipants: a.currentParticipants,
+              itemsToPrep: a.itemsToPrep || undefined,
+              routeFile: a.routeFile || undefined,
+              organizerPhone: a.organizerPhone,
+              difficulty: a.difficulty as 1 | 2 | 3 | 4 | 5,
+              organizerId: a.organizerId,
+              organizerName: a.organizerName,
+              organizerAvatar: a.organizerAvatar || undefined,
+              createdAt: a.createdAt,
+              participants: [],
+              photos: a.photos || [],
+              isCompleted: a.isCompleted,
+            }))}
+            currentUserId={user?.id}
+            joinedActivityIds={joinedActivityIds}
           />
         )
       case 'activities':
@@ -642,6 +665,29 @@ export default function AkinaApp() {
           <HomeView
             lang={lang}
             onViewChange={handleViewChange}
+            activities={activities.map(a => ({
+              id: a.id,
+              title: a.title,
+              sportType: a.sportType as 'cycling' | 'hiking',
+              meetingTime: a.meetingTime,
+              meetingLocation: a.meetingLocation,
+              estimatedDuration: String(a.estimatedDuration),
+              maxParticipants: a.maxParticipants,
+              currentParticipants: a.currentParticipants,
+              itemsToPrep: a.itemsToPrep || undefined,
+              routeFile: a.routeFile || undefined,
+              organizerPhone: a.organizerPhone,
+              difficulty: a.difficulty as 1 | 2 | 3 | 4 | 5,
+              organizerId: a.organizerId,
+              organizerName: a.organizerName,
+              organizerAvatar: a.organizerAvatar || undefined,
+              createdAt: a.createdAt,
+              participants: [],
+              photos: a.photos || [],
+              isCompleted: a.isCompleted,
+            }))}
+            currentUserId={user?.id}
+            joinedActivityIds={joinedActivityIds}
           />
         )
     }
