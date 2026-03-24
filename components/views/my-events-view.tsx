@@ -2,7 +2,7 @@
 
 // Force rebuild - v3 - fixed duplicate state
 import { useState, useRef } from 'react'
-import { Bike, Footprints, Star, Clock, MapPin, Camera, X, Share2, Image as ImageIcon } from 'lucide-react'
+import { Bike, Footprints, Star, Clock, MapPin, Users, Camera, X, Share2, Image as ImageIcon } from 'lucide-react'
 import { translations, Activity } from '@/lib/types'
 import GlassSurface from '@/components/glass-surface'
 
@@ -10,6 +10,7 @@ interface MyEventsViewProps {
   lang: 'en' | 'zh'
   activities: Activity[]
   joinedActivityIds: string[]
+  currentUserId?: string
   onUploadPhoto: (activityId: string, photoFile: File) => Promise<void>
   onShareActivity: (activity: Activity) => Promise<void>
 }
@@ -18,6 +19,7 @@ export default function MyEventsView({
   lang, 
   activities, 
   joinedActivityIds,
+  currentUserId,
   onUploadPhoto,
   onShareActivity
 }: MyEventsViewProps) {
@@ -30,7 +32,9 @@ export default function MyEventsView({
   
   const t = translations[lang].myevents
 
-  const myActivities = activities.filter(a => joinedActivityIds.includes(a.id))
+  const myActivities = activities.filter(
+    (a) => joinedActivityIds.includes(a.id) || (currentUserId ? a.organizerId === currentUserId : false),
+  )
   const now = new Date()
   
   const upcomingActivities = myActivities.filter(a => {
@@ -189,6 +193,12 @@ export default function MyEventsView({
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="w-4 h-4" />
                       <span className="font-semibold truncate">{activity.meetingLocation}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="w-4 h-4" />
+                      <span className="font-semibold">
+                        {lang === 'en' ? 'Participants' : '参与者'}: {activity.participants?.join(', ') || '-'}
+                      </span>
                     </div>
                   </div>
 
