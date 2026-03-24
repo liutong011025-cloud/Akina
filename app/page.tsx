@@ -156,6 +156,7 @@ export default function AkinaApp() {
       .select(`
         *,
         organizer:profiles!organizer_id(username, avatar_url),
+        activity_participants(user_id, user:profiles(username)),
         activity_photos(id, photo_url, user_id, created_at)
       `)
       .order('meeting_time', { ascending: true })
@@ -184,7 +185,11 @@ export default function AkinaApp() {
         organizerName: (activity.organizer as { username?: string })?.username || 'Unknown',
         organizerAvatar: (activity.organizer as { avatar_url?: string })?.avatar_url,
         isCompleted: activity.status === 'completed',
-        participants: [],
+        participants: ((activity.activity_participants as Array<{
+          user?: { username?: string | null }
+        }>) || [])
+          .map((p) => p.user?.username || '')
+          .filter(Boolean),
         photos: ((activity.activity_photos as Array<{
           id: string
           photo_url: string
@@ -332,7 +337,7 @@ export default function AkinaApp() {
         organizerId: data.organizer_id,
         organizerName: profile.username || 'Unknown',
         isCompleted: data.status === 'completed',
-        participants: [],
+        participants: profile.username ? [profile.username] : [],
         photos: [],
         createdAt: data.created_at,
       }
@@ -361,7 +366,13 @@ export default function AkinaApp() {
     setJoinedActivityIds(prev => [...prev, activityId])
     setActivities(prev => prev.map(a =>
       a.id === activityId
-        ? { ...a, currentParticipants: a.currentParticipants + 1 }
+        ? {
+            ...a,
+            currentParticipants: a.currentParticipants + 1,
+            participants: profile?.username && !a.participants.includes(profile.username)
+              ? [...a.participants, profile.username]
+              : a.participants,
+          }
         : a
     ))
 
@@ -546,12 +557,15 @@ export default function AkinaApp() {
               organizerName: a.organizerName,
               organizerAvatar: a.organizerAvatar || undefined,
               createdAt: a.createdAt,
-              participants: [],
+              participants: a.participants || [],
               photos: a.photos || [],
               isCompleted: a.isCompleted,
             }))}
             currentUserId={user?.id}
             joinedActivityIds={joinedActivityIds}
+            onJoinActivity={handleJoinActivity}
+            isLoggedIn={!!user}
+            onLoginRequired={() => setActiveView('login')}
           />
         )
       case 'activities':
@@ -575,13 +589,14 @@ export default function AkinaApp() {
               organizerName: a.organizerName,
               organizerAvatar: a.organizerAvatar || undefined,
               createdAt: a.createdAt,
-              participants: [],
+              participants: a.participants || [],
               photos: a.photos || [],
               isCompleted: a.isCompleted,
             }))}
             joinedActivities={joinedActivityIds}
             onJoinActivity={handleJoinActivity}
             onShareActivity={handleShareActivity}
+            currentUserId={user?.id}
             isLoggedIn={!!user}
             onLoginRequired={() => setActiveView('login')}
           />
@@ -632,11 +647,12 @@ export default function AkinaApp() {
               organizerName: a.organizerName,
               organizerAvatar: a.organizerAvatar || undefined,
               createdAt: a.createdAt,
-              participants: [],
+              participants: a.participants || [],
               photos: a.photos || [],
               isCompleted: a.isCompleted,
             }))}
             joinedActivityIds={joinedActivityIds}
+            currentUserId={user?.id}
             onUploadPhoto={handleUploadPhoto}
             onShareActivity={handleShareActivity}
           />
@@ -682,12 +698,15 @@ export default function AkinaApp() {
               organizerName: a.organizerName,
               organizerAvatar: a.organizerAvatar || undefined,
               createdAt: a.createdAt,
-              participants: [],
+              participants: a.participants || [],
               photos: a.photos || [],
               isCompleted: a.isCompleted,
             }))}
             currentUserId={user?.id}
             joinedActivityIds={joinedActivityIds}
+            onJoinActivity={handleJoinActivity}
+            isLoggedIn={!!user}
+            onLoginRequired={() => setActiveView('login')}
           />
         )
     }
