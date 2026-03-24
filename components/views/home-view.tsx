@@ -10,6 +10,9 @@ interface HomeViewProps {
   activities: Activity[]
   currentUserId?: string
   joinedActivityIds?: string[]
+  onJoinActivity: (activityId: string) => void
+  isLoggedIn?: boolean
+  onLoginRequired?: () => void
 }
 
 export default function HomeView({
@@ -18,6 +21,9 @@ export default function HomeView({
   activities,
   currentUserId,
   joinedActivityIds = [],
+  onJoinActivity,
+  isLoggedIn = false,
+  onLoginRequired,
 }: HomeViewProps) {
   const t = translations[lang].home
 
@@ -151,6 +157,10 @@ export default function HomeView({
                 activity={activity} 
                 lang={lang}
                 formatDate={formatDate}
+                isJoined={joinedActivityIds.includes(activity.id) || activity.organizerId === currentUserId}
+                isLoggedIn={isLoggedIn}
+                onLoginRequired={onLoginRequired}
+                onJoinActivity={onJoinActivity}
               />
             ))}
           </div>
@@ -163,11 +173,19 @@ export default function HomeView({
 function ActivityCard({ 
   activity, 
   lang, 
-  formatDate 
+  formatDate,
+  isJoined,
+  isLoggedIn,
+  onLoginRequired,
+  onJoinActivity,
 }: { 
   activity: Activity
   lang: 'en' | 'zh'
   formatDate: (date: string) => string
+  isJoined: boolean
+  isLoggedIn: boolean
+  onLoginRequired?: () => void
+  onJoinActivity: (activityId: string) => void
 }) {
   const t = translations[lang].home
   const spotsLeft = activity.maxParticipants - activity.currentParticipants
@@ -227,8 +245,21 @@ function ActivityCard({
               {spotsLeft} {t.spots}
             </span>
           </div>
-          <button className="bg-foreground text-background px-4 py-2 rounded-full text-sm font-bold active:scale-95 transition-transform">
-            {t.join}
+          <button
+            onClick={() => {
+              if (!isLoggedIn && onLoginRequired) {
+                onLoginRequired()
+                return
+              }
+              if (!isJoined) {
+                onJoinActivity(activity.id)
+              }
+            }}
+            className={`px-4 py-2 rounded-full text-sm font-bold active:scale-95 transition-transform ${
+              isJoined ? 'bg-highlight-green text-white' : 'bg-foreground text-background'
+            }`}
+          >
+            {isJoined ? translations[lang].activities.joined : t.join}
           </button>
         </div>
       </div>
