@@ -30,6 +30,7 @@ export default function ActivitiesView({
 
   const filteredActivities = activities
     .filter(a => filter === 'all' || a.sportType === filter)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
